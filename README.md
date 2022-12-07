@@ -2,7 +2,7 @@
 
 This is a small light weight logger that provides APIs for debugging and error
 logging, similar to loggers in other languages, such as the Closure JS Logger
-and java.util.logging.Logger. The logs emitted can be listen by multiple
+and java.util.logging.Logger. The logs emitted can be listened by multiple
 listeners.
 
 ## Initializing
@@ -18,7 +18,7 @@ logger = Logger.create()
 
 Logger.root().level = Level.ALL  # defaults to Level.INFO
 
-logger.onRecord.listen(lambda v: print(f'log {v}'))
+logger.onRecord.listen(lambda record: print(f'log {record}'))
 
 logger.info('hello world')
 ```
@@ -45,7 +45,7 @@ Create a `Logger` with a unique name to easily identify the source of the log
 messages.
 
 ```python
-log = Logger('MyClassName')
+log = Logger.create('MyClassName')
 ```
 
 When logging more complex messages, you can pass a closure instead that will be
