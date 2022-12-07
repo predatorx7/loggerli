@@ -1,15 +1,10 @@
 # Loggerli
 
-This is a small light weight logger that provides APIs for debugging and error
-logging, similar to loggers in other languages, such as the Closure JS Logger
-and java.util.logging.Logger. The logs emitted can be listened by multiple
-listeners.
+This is a small light weight logger that provides APIs for debugging and error logging, similar to loggers in other languages, such as the Closure JS Logger and java.util.logging.Logger. The logs emitted can be listened by multiple listeners.
 
 ## Initializing
 
-By default, the logging package does not do anything useful with the log
-messages. You must configure the logging level and add a handler for the log
-messages.
+By default, the loggerli package does not do anything useful with the log messages. You must configure the logging level and add a handler for the log messages.
 
 Here is a simple logging configuration that logs all messages via `print`.
 
@@ -23,8 +18,7 @@ logger.onRecord.listen(lambda record: print(f'log {record}'))
 logger.info('hello world')
 ```
 
-First, set the root `Level`. All messages at or above the current level are sent
-to the `onRecord` stream. Available levels are:
+First, set the root `Level`. All messages at or above the current level are sent to the `onRecord` stream. Available levels are:
 
 - `Level.OFF`
 - `Level.SHOUT`
@@ -36,20 +30,17 @@ to the `onRecord` stream. Available levels are:
 - `Level.FINER`
 - `Level.FINEST`
 
-Then, listen on the `onRecord` stream for `LogRecord` events. The `LogRecord`
-class has various properties for the message, error, logger name, and more.
+Then, listen on the `onRecord` that returns a [Listenable] for `LogRecord` events. The `LogRecord` class has various properties for the message, error, logger name, and more.
 
 ## Logging messages
 
-Create a `Logger` with a unique name to easily identify the source of the log
-messages.
+Create a `Logger` with a unique name to easily identify the source of the log messages.
 
 ```python
 log = Logger.create('MyClassName')
 ```
 
-When logging more complex messages, you can pass a closure instead that will be
-evaluated only if the message is actually logged:
+When logging more complex messages, you can pass a closure instead that will be evaluated only if the message is actually logged:
 
 ```dart
 log.fine(lambda: [1, 2, 3, 4, 5])
