@@ -1,4 +1,3 @@
-
 from src.loggerli.level import Level
 from src.loggerli.logger import Logger
 
