@@ -16,7 +16,7 @@ class Listenable(ABC):
         pass
 
 
-def verifyListener(listener):
+def verify_listener(listener):
     assert(callable(listener)), \
         "A listener must be callable"
     t = signature(listener)
@@ -37,9 +37,9 @@ class StateNotifier(Listenable):
     @value.setter
     def value(self, o):
         self.__value = o
-        self.notifyListeners()
+        self.notify_listeners()
 
-    def notifyListeners(self):
+    def notify_listeners(self):
         for key in self.__listeners:
             try:
                 self.__listeners[key](self.value)
@@ -47,11 +47,11 @@ class StateNotifier(Listenable):
                 print(e)
 
     def listen(self, listener):
-        verifyListener(listener)
+        verify_listener(listener)
         self.__listeners[self.__i] = listener
-        def removeListenerCallback(): return self.__listeners.pop(self.__i)
+        def remove_listener_callback(): return self.__listeners.pop(self.__i)
         self.__i += 1
-        return removeListenerCallback
+        return remove_listener_callback
 
     def dispose(self):
         self.__listeners.clear()

@@ -5,10 +5,6 @@ from .level import Level
 from .notifier import Listenable, StateNotifier
 from .log_record import LogRecord
 
-defaultLevel = Level.INFO
-
-_loggers = dict()
-
 
 class imdict(dict):
     def __hash__(self):
@@ -28,8 +24,10 @@ class imdict(dict):
 
 class Logger(object):
     __create_key = object()
+    __loggers = dict()
 
-    hierarchicalLoggingEnabled = False
+    hierarchical_logging_enabled = False
+    default_level = Level.INFO
 
     def __init__(self, create_key=None, name: str = None, parent: Logger = None, children: dict = None) -> None:
         assert(create_key == Logger.__create_key), \
@@ -40,7 +38,7 @@ class Logger(object):
         self.children = imdict(children)
         self.__level = None
         if (parent == None):
-            self.__level = defaultLevel
+            self.__level = Logger.default_level
         else:
             parent.__children[name] = self
         self.__controller: StateNotifier = None
@@ -50,74 +48,77 @@ class Logger(object):
         return Logger.create('')
 
     @property
-    def fullName(self):
+    def full_name(self):
         if (self.parent != None and self.parent.name != ''):
-            return f'{self.parent.fullName}.{self.name}'
+            return f'{self.parent.full_name}.{self.name}'
         return self.name
 
     @classmethod
     def create(cls, name='') -> Logger:
-        if name not in _loggers:
-            _loggers[name] = Logger.__named(cls.__create_key, name)
-        return _loggers[name]
+        if name not in Logger.__loggers:
+            Logger.__loggers[name] = Logger.__named(cls.__create_key, name)
+        return Logger.__loggers[name]
+
+    def child(self, name) -> Logger:
+        return Logger.create(f'{self.full_name}.{name}')
 
     @staticmethod
     def __named(create_key, name: str):
-        indexOfDot = name.find('.')
-        if (indexOfDot == 0):
+        index_of_dot = name.find('.')
+        if (index_of_dot == 0):
             raise NameError("name shouldn't start with a '.'")
-        if (name != '' and indexOfDot == len(name) - 1):
+        if (name != '' and index_of_dot == len(name) - 1):
             raise NameError("name shouldn't end with a '.'")
         dot = name.rfind('.')
         parent: Logger = None
-        thisName: str = None
+        this_name: str = None
         if (dot == -1):
             if (name != ''):
                 parent = Logger.create('')
-            thisName = name
+            this_name = name
         else:
             parent = Logger.create(name[0: dot])
-            thisName = name[dot + 1:]
-        return Logger(create_key, thisName, parent, dict())
+            this_name = name[dot + 1:]
+        return Logger(create_key, this_name, parent, dict())
 
     @property
     def level(self) -> Level:
-        effectiveLevel: Level
+        effective_level: Level
         if (self.parent == None):
-            effectiveLevel = self.__level
+            effective_level = self.__level
         else:
             if (self.__level != None):
-                effectiveLevel = self.__level
-            elif not Logger.hierarchicalLoggingEnabled:
-                effectiveLevel = Logger.root().__level
+                effective_level = self.__level
+            elif not Logger.hierarchical_logging_enabled:
+                effective_level = Logger.root().__level
             else:
-                effectiveLevel = self.parent.level
-        return effectiveLevel
+                effective_level = self.parent.level
+        return effective_level
 
     @level.setter
     def level(self, value: Level):
-        if (not Logger.hierarchicalLoggingEnabled and self.parent != None):
+        if (not Logger.hierarchical_logging_enabled and self.parent != None):
             raise ValueError(
-                "unsupported: Please set \"Logger.hierarchicalLoggingEnabled\" to true if you want to change the level on a non-root logger.")
+                "unsupported: Please set \"Logger.hierarchical_logging_enabled\" to true if you want to change the level on a non-root logger.")
         if (self.parent == None and value == None):
             raise ValueError(
                 "unsupported: Cannot set the level to `null` on a logger with no parent.")
         self.__level = value
 
     @property
-    def onRecord(self) -> Listenable:
+    def on_record(self) -> Listenable:
         if (self.__controller == None):
             self.__controller = StateNotifier()
         return self.__controller
 
-    def clearListeners(self):
-        if (Logger.hierarchicalLoggingEnabled or self.parent == None):
+    def clear_listeners(self):
+        if (Logger.hierarchical_logging_enabled or self.parent == None):
             if (self.__controller != None):
                 self.__controller.dispose()
         else:
-            Logger.root().clearListeners()
+            Logger.root().clear_listeners()
 
-    def isLoggable(self, value: Level) -> bool:
+    def is_loggable(self, value: Level) -> bool:
         return value >= self.level
 
     def __publish(self, record: LogRecord):
@@ -126,7 +127,7 @@ class Logger(object):
 
     def log(self, logLevel: Level, message, error=None, stackTrace=None):
         object = None
-        if (self.isLoggable(logLevel)):
+        if (self.is_loggable(logLevel)):
             if callable(message):
                 message = message()
             msg: str
@@ -135,11 +136,11 @@ class Logger(object):
             else:
                 msg = str(message)
                 object = message
-            record = LogRecord(logLevel, msg, self.fullName,
+            record = LogRecord(logLevel, msg, self.full_name,
                                error, stackTrace, object,)
             if (self.parent == None):
                 self.__publish(record)
-            elif (not Logger.hierarchicalLoggingEnabled):
+            elif (not Logger.hierarchical_logging_enabled):
                 Logger.root().__publish(record)
             else:
                 target: Logger = self

@@ -1,21 +1,20 @@
 from .level import Level
 from datetime import datetime
 
-_nextNumber = 0
-
 
 class LogRecord:
-    def __init__(self, level: Level, message: str, loggerName: str, error=None, stackTrace=None, object=None) -> None:
+    __next_number = 0
+
+    def __init__(self, level: Level, message: str, logger_name: str, error=None, stack_trace=None, object=None) -> None:
         self.level = level
         self.message = message
-        self.loggerName = loggerName
+        self.logger_name = logger_name
         self.error = error
-        self.stackTrace = stackTrace
+        self.stack_trace = stack_trace
         self.object = object
         self.time = datetime.now()
-        global _nextNumber
-        self.sequenceNumber = _nextNumber
-        _nextNumber += 1
+        self.sequenceNumber = LogRecord.__next_number
+        LogRecord.__next_number += 1
 
     def __str__(self):
-        return f'[{self.level.name}] {self.loggerName}: {self.message}'
+        return f'[{self.level.name}] {self.logger_name}: {self.message}'

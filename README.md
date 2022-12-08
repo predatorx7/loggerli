@@ -21,13 +21,13 @@ logger = Logger.create()
 
 Logger.root().level = Level.ALL  # defaults to Level.INFO
 
-logger.onRecord.listen(lambda record: print(f'log {record}'))
+logger.on_record.listen(lambda record: print(f'log {record}'))
 
 logger.info('hello world')
 ```
 
 First, set the root `Level`. All messages at or above the current level are sent
-to the `onRecord` stream. Available levels are:
+to the `on_record` stream. Available levels are:
 
 - `Level.OFF`
 - `Level.SHOUT`
@@ -39,7 +39,7 @@ to the `onRecord` stream. Available levels are:
 - `Level.FINER`
 - `Level.FINEST`
 
-Then, listen on the `onRecord` that returns a [Listenable] for `LogRecord`
+Then, listen on the `on_record` that returns a [Listenable] for `LogRecord`
 events. The `LogRecord` class has various properties for the message, error,
 logger name, and more.
 
@@ -87,7 +87,7 @@ logger = Logger.create()
 
 logger.level = Level.ALL
 
-logger.onRecord.listen(lambda x: print(x))
+logger.on_record.listen(lambda x: print(x))
 
 logger.info("hello world")
 
