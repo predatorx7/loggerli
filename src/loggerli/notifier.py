@@ -17,9 +17,9 @@ class Listenable(ABC):
 
 
 def verifyListener(listener):
-    t = signature(listener)
     assert(callable(listener)), \
         "A listener must be callable"
+    t = signature(listener)
     assert(t.parameters), \
         "A listener must have one parameter to accept value"
 
