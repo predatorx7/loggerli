@@ -105,3 +105,8 @@ For example, if I want to install from the `main` branch then my command will be
 ```sh
 pip install git+https://github.com/predatorx7/loggerli.git@main#egg=loggerli
 ```
+
+## Note
+
+This logger is completely based on https://pub.dev/packages/logging.
+
