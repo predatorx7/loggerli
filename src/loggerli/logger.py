@@ -8,7 +8,6 @@ from .log_record import LogRecord
 defaultLevel = Level.INFO
 
 _loggers = dict()
-hierarchicalLoggingEnabled = False
 
 
 class imdict(dict):
@@ -29,6 +28,8 @@ class imdict(dict):
 
 class Logger(object):
     __create_key = object()
+
+    hierarchicalLoggingEnabled = False
 
     def __init__(self, create_key=None, name: str = None, parent: Logger = None, children: dict = None) -> None:
         assert(create_key == Logger.__create_key), \
@@ -87,7 +88,7 @@ class Logger(object):
         else:
             if (self.__level != None):
                 effectiveLevel = self.__level
-            elif not hierarchicalLoggingEnabled:
+            elif not Logger.hierarchicalLoggingEnabled:
                 effectiveLevel = Logger.root().__level
             else:
                 effectiveLevel = self.parent.level
@@ -95,9 +96,9 @@ class Logger(object):
 
     @level.setter
     def level(self, value: Level):
-        if (not hierarchicalLoggingEnabled and self.parent != None):
+        if (not Logger.hierarchicalLoggingEnabled and self.parent != None):
             raise ValueError(
-                "unsupported: Please set \"hierarchicalLoggingEnabled\" to true if you want to change the level on a non-root logger.")
+                "unsupported: Please set \"Logger.hierarchicalLoggingEnabled\" to true if you want to change the level on a non-root logger.")
         if (self.parent == None and value == None):
             raise ValueError(
                 "unsupported: Cannot set the level to `null` on a logger with no parent.")
@@ -110,7 +111,7 @@ class Logger(object):
         return self.__controller
 
     def clearListeners(self):
-        if (hierarchicalLoggingEnabled or self.parent == None):
+        if (Logger.hierarchicalLoggingEnabled or self.parent == None):
             if (self.__controller != None):
                 self.__controller.dispose()
         else:
@@ -138,7 +139,7 @@ class Logger(object):
                                error, stackTrace, object,)
             if (self.parent == None):
                 self.__publish(record)
-            elif (not hierarchicalLoggingEnabled):
+            elif (not Logger.hierarchicalLoggingEnabled):
                 Logger.root().__publish(record)
             else:
                 target: Logger = self
