@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from inspect import signature
 
 
 class Listenable(ABC):
@@ -14,6 +15,10 @@ class Listenable(ABC):
     def dispose(self):
         pass
 
+def verifyListener(listener):
+    t = signature(listener)
+    assert(t.parameters), \
+        "A listener must have one parameter to accept value"
 
 class StateNotifier(Listenable):
     def __init__(self, value=None) -> None:
@@ -38,6 +43,7 @@ class StateNotifier(Listenable):
                 print(e)
 
     def listen(self, listener):
+        verifyListener(listener)
         self.__listeners[self.__i] = listener
         def removeListenerCallback(): return self.__listeners.pop(self.__i)
         self.__i += 1

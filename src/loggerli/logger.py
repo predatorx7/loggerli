@@ -111,15 +111,17 @@ class Logger(object):
 
     def clearListeners(self):
         if (hierarchicalLoggingEnabled or self.parent == None):
-            self.__controller.dispose()
+            if (self.__controller != None):
+                self.__controller.dispose()
         else:
-            Logger.create('').clearListeners()
+            Logger.root().clearListeners()
 
     def isLoggable(self, value: Level) -> bool:
         return value >= self.level
 
     def __publish(self, record: LogRecord):
-        self.__controller.value = record
+        if (self.__controller != None):
+            self.__controller.value = record
 
     def log(self, logLevel: Level, message, error=None, stackTrace=None):
         object = None
