@@ -15,10 +15,14 @@ class Listenable(ABC):
     def dispose(self):
         pass
 
+
 def verifyListener(listener):
     t = signature(listener)
+    assert(callable(listener)), \
+        "A listener must be callable"
     assert(t.parameters), \
         "A listener must have one parameter to accept value"
+
 
 class StateNotifier(Listenable):
     def __init__(self, value=None) -> None:
